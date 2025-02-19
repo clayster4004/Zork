@@ -14,7 +14,7 @@ std::string Location::getDesc() const {
     return this->desc;
 }
 
-std::map<std::string, Location> Location::getLocations() const {
+std::map<std::string, std::reference_wrapper<Location>> Location::getLocations() const {
     return this->neighborsMap;
 }
 
@@ -49,8 +49,8 @@ void Location::setVisited() {
     this->hasVisited = true;
 }
 
-void Location::addLocation(const std::string& direction, const Location& location) {
-    neighborsMap[direction] = location;
+void Location::addLocation(const std::string direction, const std::reference_wrapper<Location> location) {
+    neighborsMap.emplace(direction, location);
 }
 
 void Location::addNpc(const Npc& npc) {
@@ -61,6 +61,7 @@ void Location::addItem (const Item& item) {
     itemVec.push_back(item);
 }
 
-std::ostream& operator<<(std::ostream& os, const Npc& npc) {
-    os << 
+std::ostream& operator<<(std::ostream& os, const Location& location) {
+    os << location.name << " - " << location.desc;
+    return os;
 }

@@ -67,6 +67,7 @@
     "print": "cpp",
     "queue": "cpp",
     "ratio": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "map": "cpp"
   }
 }
