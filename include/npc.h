@@ -11,9 +11,10 @@ class Npc {
         // name and desc will be refs
         Npc(const std::string& name, const std::string& desc);
 
-        // Initialize getters -- only name and desc
+        // Initialize getters -- only name, desc, and message
         std::string getName() const;
         std::string getDesc() const;
+        std::string getMessage(); // Not a const -> updates messageNum
 
         // Initialize setters
         void setName(const std::string& newName);
@@ -22,7 +23,6 @@ class Npc {
         // Additional functions
         // Cannot mark as const because it'll update member vars
         // Not a friend because it is a member funciton 
-        std::string getMessage();
         void addMessage(const std::string& newMessage);
 
         // Overloaded Stream Operator
