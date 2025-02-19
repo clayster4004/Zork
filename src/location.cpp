@@ -62,12 +62,6 @@ void Location::addItem (const Item& item) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Location& location) {
-    // os << location.name << " - " << location.desc << std::endl
-    //    << std::endl << "You see the following NPCs:" << std::endl
-    //    << "- " << location.getNpcs() << "You see the following items: "
-    //    << std::endl << location.getItems() << "You can go the following directions: "
-    //    << location.getLocations() << std::endl;
-
     // The basic information regarding the location
     os << location.name << " - " << location.desc << std::endl << std::endl;
 
