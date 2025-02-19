@@ -62,6 +62,38 @@ void Location::addItem (const Item& item) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Location& location) {
-    os << location.name << " - " << location.desc;
+    // os << location.name << " - " << location.desc << std::endl
+    //    << std::endl << "You see the following NPCs:" << std::endl
+    //    << "- " << location.getNpcs() << "You see the following items: "
+    //    << std::endl << location.getItems() << "You can go the following directions: "
+    //    << location.getLocations() << std::endl;
+
+    // The basic information regarding the location
+    os << location.name << " - " << location.desc << std::endl << std::endl;
+
+    // The basic information regarding the Npcs
+    os << "You see the following NPCs:" << std::endl;
+    for (auto it=location.npcVec.begin(); it != location.npcVec.end(); ++it) {
+        os << " -" << *it << std::endl;
+    }
+    os << std::endl;
+
+    // The basic information regarding the items
+    os << "You see the following Items:" << std::endl;
+    for (auto it=location.itemVec.begin(); it != location.itemVec.end(); ++it) {
+        os << " -" << *it << std::endl;
+    }
+    os << std::endl;
+
+    // The basic information regarding the directions in which you can travel
+    os << "You can go in the following Directions: " << std::endl;
+    for (const auto& entry : location.getLocations()) {
+        if (entry.second.get().getVisited()) {
+            os << "- " << entry.first << " - " << entry.second.get() << " (Visited)" << std::endl;
+        } else {
+            os << " -" << entry.first << " - " << "Unknown" << std::endl;
+        }
+    }
+
     return os;
 }
