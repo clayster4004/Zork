@@ -30,9 +30,18 @@ class Game {
 
         // Additional Functions
         std::map<std::string, Command> setupCommands();
-        static void showHelp(std::vector<std::string> args);
+        static void showHelp(std::vector<std::string> target);
         void createWorld();
         Location randomLocation();
+        void talk(std::vector<std::string> target); 
+        void meet(std::vector<std::string> target);
+        void take(std::vector<std::string> target);
+        void give(std::vector<std::string> target);
+        void go(std::vector<std::string> target);
+        void showItems(std::vector<std::string> target);
+        void look(std::vector<std::string> target);
+        static void quit(std::vector<std::string> target);
+        // Two additional functions
 
         void play();
 
