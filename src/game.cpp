@@ -49,11 +49,85 @@ void Game::createWorld() {
     Npc* npcElise = new Npc("Elise", "She can shapesift into a spider, that's pretty cool I guess");
     Npc* npcPowder = new Npc("Powder", "A seemingly normal child among all the beasts");
 
+    // Add the voice lines to the characters
+    npcClay->addMessage("Hello there");
+    npcSmeech->addMessage("Hello there");
+    npcSteb->addMessage("Hello there");
+    npcScar->addMessage("Hello there");
+    npcTwitch->addMessage("Hello there");
+    npcMord->addMessage("Hello there");
+    npcElise->addMessage("Hello there");
+    npcPowder->addMessage("Hello there");
+
     // Create all the Items
+    Item* itemAle = new Item("Ale", "Dark in color, a scotch ale perhaps", 100, 7.5);
+    Item* itemWine = new Item("Wine", "A bottle of Snoop Dogg's Cali Red", 150, 5);
+    Item* itemVodka = new Item("Vodka", "A shot of Kirkland vodka, doesn't get much worse that that", 50, 2.5);
+    Item* itemBrandy = new Item("Brandy", "I've never had brandy, although it smells disgusting", 50, 5);
+    Item* itemLager = new Item("Lager", "Doesn't ever single one of these taste the same?", 50, 7.5);
+    Item* itemMead = new Item("Mead", "Where does one even buy mead?", 50, 5);
+    Item* itemCocktail = new Item("Cocktail", "It has an umbrella in it, must be good...", 200, 7.5);
+    Item* itemOrb = new Item("Orb", "You've unlocked a secret!", 0, 10);
 
+    // Place the npcs and the items in the locations
+    locationMac->addNpc(*npcClay);
+    locationMac->addItem(*itemAle);
 
+    locationManitou->addNpc(*npcSmeech);
+    locationManitou->addItem(*itemWine);
+
+    locationKirkhof->addNpc(*npcSteb);
+    locationKirkhof->addItem(*itemVodka);
+
+    locationKindschi->addNpc(*npcScar);
+    locationKindschi->addItem(*itemBrandy);
+
+    locationRec->addNpc(*npcTwitch);
+    locationRec->addItem(*itemLager);
+
+    locationClockTower->addNpc(*npcMord);
+    locationClockTower->addItem(*itemMead);
+
+    locationLibrary->addNpc(*npcElise);
+    locationLibrary->addItem(*itemCocktail);
+
+    locationWoods->addNpc(*npcPowder);
+    locationWoods->addItem(*itemOrb);
+
+    // Add the locations relations to one another
+    locationWoods->addLocation("west", std::ref(*locationMac));
+
+    locationMac->addLocation("east", std::ref(*locationWoods));
+    locationMac->addLocation("south", std::ref(*locationManitou));
+
+    locationManitou->addLocation("north", std::ref(*locationMac));
+    locationManitou->addLocation("west", std::ref(*locationKindschi));
+
+    locationKindschi->addLocation("east", std::ref(*locationManitou));
+    locationKindschi->addLocation("south", std::ref(*locationClockTower));
+    locationKindschi->addLocation("west", std::ref(*locationRec));
+
+    locationRec->addLocation("east", std::ref(*locationKindschi));
+
+    locationClockTower->addLocation("north", std::ref(*locationKindschi));
+    locationClockTower->addLocation("south", std::ref(*locationKirkhof));
+
+    locationKirkhof->addLocation("north", std::ref(*locationClockTower));
+    locationKirkhof->addLocation("west", std::ref(*locationLibrary));
+
+    locationLibrary->addLocation("east", std::ref(*locationKirkhof));
+
+    // Put all the locations on the location vec
     locations.push_back(*locationMac);
-    this->currentLocation = *locationMac;
+    locations.push_back(*locationManitou);
+    locations.push_back(*locationKindschi);
+    locations.push_back(*locationRec);
+    locations.push_back(*locationClockTower);
+    locations.push_back(*locationKirkhof);
+    locations.push_back(*locationLibrary);
+    locations.push_back(*locationWoods);
+    
+    this->currentLocation = randomLocation();
 }
 
 std::map<std::string, Command> Game::setupCommands() {
@@ -77,6 +151,7 @@ std::map<std::string, Command> Game::setupCommands() {
     commands["backpack"] = [this](std::vector<std::string> target) { this->showItems(target); };
     commands["items"] = [this](std::vector<std::string> target) { this->showItems(target); };
     commands["look"] = [this](std::vector<std::string> target) { this->look(target); };
+    commands["where"] = [this](std::vector<std::string> target) { this->look(target); };
     
     return commands;
 
@@ -87,27 +162,170 @@ void Game::showHelp(std::vector<std::string> target) {
 }
 
 void Game::talk(std::vector<std::string> target) {
-    std::cout << "talk" << std::endl;
+    if (target.empty()) {
+        std::cout << "Talk to whom?" << std::endl;
+        return;
+    }
+    
+    std::string npcName = target[0];
+    
+    // Use the non-const accessor to get the actual NPCs
+    std::vector<Npc>& npcs = currentLocation.getNpcsRef();
+    
+    bool found = false;
+    for (auto &npc : npcs) {
+        if (npc.getName() == npcName) {
+            // Get and print the message.
+            std::string message = npc.getMessage();
+            std::cout << npc.getName() << " says: " << message << std::endl;
+            found = true;
+            break;
+        }
+    }
+    
+    if (!found) {
+        std::cout << "There is no one named \"" << npcName << "\" here." << std::endl;
+    }
 }
 
+
 void Game::meet(std::vector<std::string> target) {
-    //TODO
+    //std::cout << "meet" << std::endl;
+    if (target.empty()) {
+        std::cout << "Who are we meeting...?" << std::endl;
+        return;
+    }
+    std::string npcName = target[0];
+
+    std::vector<Npc> npcs = currentLocation.getNpcs();
+
+    bool found = false;
+    for (const auto& npc: npcs) {
+        if (npc.getName() == npcName) {
+            std::cout << npc.getDesc() << std::endl;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        std::cout << "No one by that name is here." << std::endl;
+    }
+
 }
 
 void Game::take(std::vector<std::string> target) {
-    //TODO
+    // std::cout << "take" << std::endl;
+    if (target.empty()) {
+        std::cout << "Take what?" << std::endl;
+        return;
+    }
+
+    std::string itemName = target[0];
+    
+    // Get a reference to the current location's items.
+    // If your getItems() returns by value, you'll need to change it so that you can modify the vector.
+    std::vector<Item>& locItems = currentLocation.getItemsRef();
+    
+    bool found = false;
+    for (auto it = locItems.begin(); it != locItems.end(); ++it) {
+        if (it->getName() == itemName) {
+            // Item found: add it to the game inventory.
+            items.push_back(*it);
+            // Remove the item from the location.
+            locItems.erase(it);
+            std::cout << "You picked up " << itemName << "." << std::endl;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cout << "There is no " << itemName << " here." << std::endl;
+    }
 }
 
 void Game::give(std::vector<std::string> target) {
-    //TODO
+    // std::cout << "give" << std::endl;
+
+    if (target.empty()) {
+        std::cout << "Give what?" << std::endl;
+        return;
+    }
+
+    std::string itemName = target[0];
+
+    // Search the player's inventory for the item.
+    auto it = std::find_if(items.begin(), items.end(),
+                           [&](const Item &i) { return i.getName() == itemName; });
+    if (it == items.end()) {
+        std::cout << "You don't have a " << itemName << "." << std::endl;
+        return;
+    }
+
+    // Found the item. Save a copy (or you could move it if C++11 move semantics apply).
+    Item item = *it;
+    
+    // Decrease the carried weight by the item's weight.
+    itemWeight -= item.getWeight();
+
+    // Remove the item from the player's inventory.
+    items.erase(it);
+
+    // Add the item to the current location's inventory.
+    currentLocation.getItemsRef().push_back(item);
+
+    // Now check if the current location is the woods.
+    if (currentLocation.getName() == "Woods Behind Campus") {
+        // Check if the item is edible. Here, we assume that an edible item has positive calories.
+        if (item.getNumCals() > 0) {
+            // If edible, reduce the calories needed.
+            neededCals -= item.getNumCals();
+            std::cout << "You fed the elf with " << item.getName() 
+                      << ". Calories reduced by " << item.getNumCals() << "." << std::endl;
+        } else {
+            // If not edible, transport the player to a new random location.
+            currentLocation = randomLocation();
+            std::cout << "That item is not edible! You are transported to " 
+                      << currentLocation.getName() << "." << std::endl;
+        }
+    } else {
+        // For other locations, simply confirm the item was given.
+        std::cout << "You gave " << item.getName() << " to the current location." << std::endl;
+    }
+
 }
 
 void Game::go(std::vector<std::string> target) {
-    //TODO
+    //std::cout << "go" << std::endl;
+    if (target.empty()) {
+        std::cout << "You didn't tell me where we are going..." << std::endl;
+        return;
+    }
+
+    // Take the first token to signal the direction in which you want to travel
+    std::string direction = target[0];
+
+    auto neighbors = currentLocation.getLocations();
+    auto it = neighbors.find(direction);
+
+    if (it != neighbors.end()) {
+        currentLocation = it->second.get();
+        std::cout << "You have traveled " << direction << " to " << currentLocation.getName() << "." << std::endl;
+    } else {
+        std::cout << "Invalid Command" << std::endl;
+    }
 }
 
 void Game::showItems(std::vector<std::string> target) {
-    //TODO
+    if (items.empty()) {
+        std::cout << "There are no items." << std::endl;
+        return;
+    }
+
+    std::cout << "Items:" << std::endl;
+    for (const auto& item : items) {
+        std::cout << " - " << item << std::endl;
+    }
 }
 
 void Game::look(std::vector<std::string> target) {
@@ -115,7 +333,21 @@ void Game::look(std::vector<std::string> target) {
 }
 
 void Game::quit(std::vector<std::string> target) {
-    //TODO
+    std::exit(0);
+}
+
+// Written by ChatGPT
+Location& Game::randomLocation() {
+    if (locations.empty()) {
+        throw std::runtime_error("No locations available.");
+    }
+    
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, locations.size() - 1);
+    
+    int index = dis(gen);
+    return locations[index].get();
 }
 
 void Game::play() {
@@ -130,13 +362,6 @@ void Game::play() {
         std::string userCommand = tokenizedResponse[0];
         // https://stackoverflow.com/questions/40656871/remove-from-the-beginning-of-stdvector
         tokenizedResponse.erase(tokenizedResponse.begin());
-
-        // Testing the input, works
-        // std::cout << userCommand << std::endl;
-        // for (const auto& token : tokenizedResponse) {
-        //     std::cout << token << " ";
-        // }
-        // std::cout << std::endl;
 
         this->commands[userCommand](tokenizedResponse);
     } 

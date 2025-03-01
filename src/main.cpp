@@ -42,7 +42,6 @@ int main() {
     // return 0;
 
     Game* myGame = new Game();
-
     myGame->play();
 
     return 0;

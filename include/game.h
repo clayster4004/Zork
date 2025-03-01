@@ -32,7 +32,7 @@ class Game {
         std::map<std::string, Command> setupCommands();
         static void showHelp(std::vector<std::string> target);
         void createWorld();
-        Location randomLocation();
+        Location& randomLocation();
         void talk(std::vector<std::string> target); 
         void meet(std::vector<std::string> target);
         void take(std::vector<std::string> target);
@@ -41,6 +41,7 @@ class Game {
         void showItems(std::vector<std::string> target);
         void look(std::vector<std::string> target);
         static void quit(std::vector<std::string> target);
+
         // Two additional functions
 
         void play();

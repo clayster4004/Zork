@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <random>
 #include "npc.h"
 #include "item.h"
 
@@ -20,7 +21,9 @@ class Location {
         std::string getDesc() const;
         std::map<std::string, std::reference_wrapper<Location>> getLocations() const;
         std::vector<Npc> getNpcs() const;
+        std::vector<Npc>& getNpcsRef();
         std::vector<Item> getItems() const;
+        std::vector<Item>& getItemsRef();
         bool getVisited() const;
 
         // Initialize setters

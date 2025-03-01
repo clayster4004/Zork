@@ -22,8 +22,16 @@ std::vector<Npc> Location::getNpcs() const {
     return this->npcVec;
 }
 
+std::vector<Npc>& Location::getNpcsRef() {
+    return npcVec;
+}
+
 std::vector<Item> Location::getItems() const {
     return this->itemVec;
+}
+
+std::vector<Item>& Location::getItemsRef() {
+    return itemVec;
 }
 
 bool Location::getVisited() const {
