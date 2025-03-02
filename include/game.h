@@ -43,6 +43,7 @@ class Game {
         static void quit(std::vector<std::string> target);
 
         // Two additional functions
+        void warp(std::vector<std::string> target);
 
         void play();
 
@@ -52,6 +53,7 @@ class Game {
         int itemWeight;
         std::vector<std::reference_wrapper<Location>> locations;
         Location currentLocation;
+        //std::reference_wrapper<Location> currentLocation;
         int neededCals = 500;
         bool gameContinue = true;
 

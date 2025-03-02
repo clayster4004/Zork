@@ -91,9 +91,9 @@ std::ostream& operator<<(std::ostream& os, const Location& location) {
     os << "You can go in the following Directions: " << std::endl;
     for (const auto& entry : location.getLocations()) {
         if (entry.second.get().getVisited()) {
-            os << "- " << entry.first << " - " << entry.second.get() << " (Visited)" << std::endl;
+            os << "- " << entry.first << " - " << entry.second.get().getName() << " (Visited)" << std::endl;
         } else {
-            os << " -" << entry.first << " - " << "Unknown" << std::endl;
+            os << "- " << entry.first << " - Unknown" << std::endl;
         }
     }
 
