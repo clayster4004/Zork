@@ -44,7 +44,7 @@ class Game {
 
         // Two additional functions
         void warp(std::vector<std::string> target);
-
+        void study(std::vector<std::string> target);
         void play();
 
     private:

@@ -63,16 +63,40 @@ void Game::createWorld() {
     Npc* npcPowder = new Npc("Powder", "A seemingly normal child among all the beasts");
 
     // Add the voice lines to the characters
-    npcClay->addMessage("Hello there");
-    npcSmeech->addMessage("Hello there");
-    npcSteb->addMessage("Hello there");
-    npcScar->addMessage("Hello there");
-    npcTwitch->addMessage("Hello there");
-    npcMord->addMessage("Hello there");
-    npcElise->addMessage("Hello there");
-    npcPowder->addMessage("Hello there");
+    npcClay->addMessage("I do most of my studying in Macinac, although I'm graduating very soon!");
+    npcClay->addMessage("How I got here? I have no idea.");
+    npcClay->addMessage("My advice to you is to find the secrets of this world.");
 
-    // Create all the Items
+    npcSmeech->addMessage("I'm from the land of the forgotten, if you're lucky, you'll end up there too.");
+    npcSmeech->addMessage("I AM NOT A RAT, I am a handsome rat.");
+    npcSmeech->addMessage("I got this hat from a near and dear friend of mine, I killed him for it.");
+
+    npcSteb->addMessage("I'm from the city below the sea, no, not Atlantis, thats 45 minutes north.");
+    npcSteb->addMessage("Smeech? Don't listen to that guy, he's harmless, although he looks hideous.");
+    npcSteb->addMessage("If you ask me, I'd get out of this town immediately.");
+
+    npcScar->addMessage("I'm net telling you what's behind the mask.");
+    npcScar->addMessage("Smeech? He's my cousin, he's my idiotic cousin...");
+    npcScar->addMessage("Everyday is a struggle, although I keep pushing forward regardless.");
+
+    npcTwitch->addMessage("Have you ever seen a rat with a crossbow? Didn't think so.");
+    npcTwitch->addMessage("I've been known to be quite the sniper...");
+    npcTwitch->addMessage("I got the lab coat from...Kindschi? It's a great loook.");
+
+    npcMord->addMessage("Nobody in this world is insane enough to challenge me.");
+    npcMord->addMessage("My father was the king, now it is I.");
+    npcMord->addMessage("The armor doesn't actually come off. It is one with Mordekaiser.");
+
+    npcElise->addMessage("Yes, I am a spider, you are not crazy.");
+    npcElise->addMessage("Well, actually... We are all a little bit crazy.");
+    npcElise->addMessage("I don't know much about you, but I'd be careful around here.");
+
+    npcPowder->addMessage("I am the only one who looks semi-normal around here, you can trust me.");
+    npcPowder->addMessage("If you want to survive bring me all the alcohol you can find.");
+    npcPowder->addMessage("No it's not for me, it's for my...friend. You just have to trust me on this one.");
+
+
+    // Create all the Items (Calorie Based Items)
     Item* itemAle = new Item("Ale", "Dark in color, a scotch ale perhaps", 100, 7.5);
     Item* itemWine = new Item("Wine", "A bottle of Snoop Dogg's Cali Red", 150, 5);
     Item* itemVodka = new Item("Vodka", "A shot of Kirkland vodka, doesn't get much worse that that", 50, 2.5);
@@ -80,8 +104,14 @@ void Game::createWorld() {
     Item* itemLager = new Item("Lager", "Doesn't ever single one of these taste the same?", 50, 7.5);
     Item* itemMead = new Item("Mead", "Where does one even buy mead?", 50, 5);
     Item* itemCocktail = new Item("Cocktail", "It has an umbrella in it, must be good...", 200, 7.5);
+
+    // Non Calorie based items
     Item* itemOrb = new Item("Orb", "You've unlocked a secret!", 0, 10);
-    Item* itemBat = new Item("Bat", "Man, I miss baseball.", 0, 30);
+    Item* itemBat = new Item("Bat", "Man, I miss baseball.", 0, 10);
+    Item* itemDumbell = new Item("Dumbell", "Pretty heavy, is Powder a weightlifter?", 0, 10);
+    Item* itemRock = new Item("Rock", "This probably means something to a geologist", 0, 7.5);
+    Item* itemMicroscope = new Item("Microscope", "Maybe there's somewhere this belongs?", 0, 7.5);
+    Item* itemDna = new Item("DNA", "I wonder who's DNA Sample this is?", 0, 1);
 
     // Place the npcs and the items in the locations
     locationMac->addNpc(*npcClay);
@@ -90,6 +120,7 @@ void Game::createWorld() {
 
     locationManitou->addNpc(*npcSmeech);
     locationManitou->addItem(*itemWine);
+    locationManitou->addItem(*itemRock);
 
     locationKirkhof->addNpc(*npcSteb);
     locationKirkhof->addItem(*itemVodka);
@@ -99,12 +130,15 @@ void Game::createWorld() {
 
     locationRec->addNpc(*npcTwitch);
     locationRec->addItem(*itemLager);
+    locationRec->addItem(*itemDumbell);
 
     locationClockTower->addNpc(*npcMord);
     locationClockTower->addItem(*itemMead);
+    locationClockTower->addItem(*itemMicroscope);
 
     locationLibrary->addNpc(*npcElise);
     locationLibrary->addItem(*itemCocktail);
+    locationLibrary->addItem(*itemDna);
 
     locationWoods->addNpc(*npcPowder);
     locationWoods->addItem(*itemOrb);
@@ -169,9 +203,9 @@ std::map<std::string, Command> Game::setupCommands() {
     commands["look"] = [this](std::vector<std::string> target) { this->look(target); };
     commands["where"] = [this](std::vector<std::string> target) { this->look(target); };
     commands["warp"] = [this](std::vector<std::string> target) { this->warp(target); };
+    commands["study"] = [this](std::vector<std::string> target) { this->study(target); };
     
     return commands;
-
 }
 
 
@@ -187,13 +221,14 @@ void Game::showHelp(std::vector<std::string> target) {
     std::cout << "  give        - Leave an item in a room ... or give to certain characters." << std::endl;
     std::cout << "  go          - Follow this with a direction to travel to new locations." << std::endl;
     std::cout << "  warp        - *Follow this with a location to warp directly there." << std::endl;
-
+    
     std::cout << std::endl << "Stand Alone Commands:" << std::endl;
     std::cout << "  help (h)    - Display this directive." << std::endl;
     std::cout << "  quit (q)    - Exit the game." << std::endl;
     std::cout << "  backpack    - Displays the carried items." << std::endl;
     std::cout << "  items       - Alias for backpack." << std::endl;
     std::cout << "  look/where  - Get an idea of your surroundings." << std::endl;
+    std::cout << "  study       - *Look at life through the lens to unlock the truth." << std::endl;
     std::cout << std::endl;
 }
 
@@ -252,7 +287,6 @@ void Game::meet(std::vector<std::string> target) {
 
 
 void Game::take(std::vector<std::string> target) {
-    // std::cout << "take" << std::endl;
     if (target.empty()) {
         std::cout << "Take what?" << std::endl;
         return;
@@ -281,13 +315,20 @@ void Game::take(std::vector<std::string> target) {
     if (!found) {
         std::cout << "There is no " << itemName << " here." << std::endl;
     }
+
+    // Update the global copy of the current location.
+    for (auto &locRef : locations) {
+        if (toLower(locRef.get().getName()) == toLower(currentLocation.getName())) {
+            locRef.get() = currentLocation;
+            break;
+        }
+    }
 }
 
 
 void Game::give(std::vector<std::string> target) {
-    // std::cout << "give" << std::endl;
     if (target.empty()) {
-        std::cout << "Give what?" << std::endl;
+        std::cout << "Give what?" << std::endl << std::endl;
         return;
     }
 
@@ -317,24 +358,52 @@ void Game::give(std::vector<std::string> target) {
             // If edible, reduce the calories needed.
             neededCals -= item.getNumCals();
             std::cout << "You fed Powder with " << item.getName() 
-                      << ". Calories reduced by " << item.getNumCals() << "." << std::endl;
+                      << ". Calories reduced by " << item.getNumCals() << "." << std::endl << std::endl;
 
             // Check if the requirement has been met
             if (neededCals <= 0) {
-                std::cout << "You win!" << std::endl;
+                std::cout << "You've done it! You've helped me succeed, said Powder." << std::endl;
+                std::cout << "You hear a loud roar from benhind you deeper into the woods." << std::endl;
+                std::cout << "An elder dragon flies upwards and vanishes into the skylight" << std::endl;
+                std::cout << "A portal opens, Powder extends her hand to you..." << std::endl;
+
+                std::cout << std::endl << "Do you take her hand? (yes/no): ";
+                std::string choice;
+                std::getline(std::cin, choice);
+                choice = toLower(choice);
+
+                if (choice == "yes" || choice == "y") {
+                    std::cout << std::endl << "You take Powder's hand and step into the portal..." << std::endl;
+                    std::cout << "A feeling of bliss overtakes you... You feel... Happy..." << std::endl;
+                    std::exit(0);
+                } else {
+                    std::cout << std::endl << "You let her go. Powder watches as the portal slowly closes behind her." << std::endl;
+                    std::cout << "What is next for me? You look around confused, why didn't you take her hand?" << std::endl;
+                    std::cout << "You feel a lightheadedness entering your brain. Is this the end?" << std::endl;
+                    std::cout << "You faint... You feel... Lost..." << std::endl;
+
+                }
                 std::exit(0);
             }
         } else {
             // If not edible, transport the player to a new random location.
             currentLocation = randomLocation();
             std::cout << "That item is not edible! You are transported to " 
-                      << currentLocation.getName() << "." << std::endl;
+                      << currentLocation.getName() << "." << std::endl << std::endl;
         }
     } else {
         // Add the item to the current location's inventory.
         currentLocation.getItemsRef().push_back(item);
         // For other locations, simply confirm the item was given.
-        std::cout << "You gave " << item.getName() << " to the current location." << std::endl;
+        std::cout << "You gave " << item.getName() << " to the current location." << std::endl << std::endl;
+    }
+
+    // Update the global copy of the current location.
+    for (auto &locRef : locations) {
+        if (toLower(locRef.get().getName()) == toLower(currentLocation.getName())) {
+            locRef.get() = currentLocation;
+            break;
+        }
     }
 
 }
@@ -363,7 +432,7 @@ void Game::go(std::vector<std::string> target) {
         std::cout << "You have traveled " << direction << " to " << currentLocation.getName() 
                   << "." << std::endl << std::endl;
     } else {
-        std::cout << "Invalid Command" << std::endl;
+        std::cout << "Invalid Command" << std::endl << std::endl;
     }
 }
 
@@ -393,18 +462,26 @@ void Game::warp(std::vector<std::string> target) {
                                    return toLower(i.getName()) == "orb"; 
                                });
     if (orbIt == items.end()) {
-        std::cout << "You don't have the orb. You cannot warp!" << std::endl;
+        std::cout << "You don't have the orb. You cannot warp!" << std::endl << std::endl;
         return;
     }
 
     // Ensure a target location was provided.
     if (target.empty()) {
-        std::cout << "Warp where?" << std::endl;
+        std::cout << "Warp where?" << std::endl << std::endl;
         return;
     }
     
-    // The first token is the target location name.
-    std::string warpTarget = target[0];  // Already lowercased if tokenizeInput does that
+    // Join all tokens in target into one string (separated by spaces)
+    std::string warpTarget;
+    for (const auto& token : target) {
+        warpTarget += token + " ";
+    }
+    if (!warpTarget.empty())
+        warpTarget.pop_back();  // Remove trailing space
+
+    // Convert the full warp target to lowercase.
+    warpTarget = toLower(warpTarget);
     bool found = false;
     
     // Search through the locations vector.
@@ -414,14 +491,45 @@ void Game::warp(std::vector<std::string> target) {
             // Found the location. Update currentLocation.
             currentLocation = locRef.get();
             currentLocation.setVisited();  // Mark as visited
-            std::cout << "Warping to " << currentLocation.getName() << "!" << std::endl;
+            std::cout << "Warping to " << currentLocation.getName() << "!" << std::endl << std::endl;
             found = true;
             break;
         }
     }
     
     if (!found) {
-        std::cout << "No such location: " << warpTarget << std::endl;
+        std::cout << "No such location: " << warpTarget << std::endl << std::endl;
+    }
+}
+
+
+void Game::study(std::vector<std::string> target) {
+    if (toLower(currentLocation.getName()) != "kindschi") {
+        std::cout << "You try to study the items in the area but nothing happens." << std::endl;
+        return;
+    }
+
+    // They are in the correct location
+    std::vector<Item>& locItems = currentLocation.getItemsRef();
+    bool hasMicroscope = false;
+    bool hasDNA = false;
+
+    for (const auto& item: locItems) {
+        std::string nameLower = toLower(item.getName());
+        if (nameLower == "microscope") {
+            hasMicroscope = true;
+        } else if (nameLower == "dna") {
+            hasDNA = true;
+        }
+    }
+
+    if (hasDNA && hasMicroscope) {
+        std::cout << std::endl
+                  << "Secret Ending Unlocked: You study the items carefully and piece together the clues!" << std::endl
+                  << "The secrets of Kindschi are revealed, and you win the game!" << std::endl << std::endl;
+        std::exit(0);
+    } else {
+        std::cout << "You study the area, but something seems to be missing..." << std::endl;
     }
 }
 
@@ -447,6 +555,9 @@ Location& Game::randomLocation() {
 
 
 void Game::play() {
+    std::cout << "You wake up, find yourself on the campus of Grand Valley..." << std::endl
+              << "Do your best to unlock the secrets that lay before you..." << std::endl
+              << "Good Luck..." << std::endl << std::endl;
     std::string response;
 
     while (gameContinue) {
