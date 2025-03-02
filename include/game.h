@@ -1,3 +1,5 @@
+// Created By: Clay Beal
+// GVZork
 #ifndef GAME_H
 #define GAME_H
 

@@ -1,3 +1,5 @@
+// Created By: Clay Beal
+// GVZork
 // This is the main file for GVZork written in C++.
 #include <iostream>
 #include "item.h"

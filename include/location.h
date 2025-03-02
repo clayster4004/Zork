@@ -1,3 +1,5 @@
+// Created By: Clay Beal
+// GVZork
 #ifndef LOCATION_H
 #define LOCATION_H
 

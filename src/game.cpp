@@ -1,3 +1,6 @@
+// Created By: Clay Beal
+// GVZork
+
 #include "game.h"
 #include <stdexcept>
 #include <vector>

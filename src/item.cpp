@@ -1,3 +1,5 @@
+// Created By: Clay Beal
+// GVZork
 #include "item.h"
 #include <stdexcept>
 

@@ -1,3 +1,5 @@
+// Created By: Clay Beal
+// GVZork
 #include "location.h"
 #include <stdexcept>
 
