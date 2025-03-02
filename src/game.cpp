@@ -81,10 +81,12 @@ void Game::createWorld() {
     Item* itemMead = new Item("Mead", "Where does one even buy mead?", 50, 5);
     Item* itemCocktail = new Item("Cocktail", "It has an umbrella in it, must be good...", 200, 7.5);
     Item* itemOrb = new Item("Orb", "You've unlocked a secret!", 0, 10);
+    Item* itemBat = new Item("Bat", "Man, I miss baseball.", 0, 30);
 
     // Place the npcs and the items in the locations
     locationMac->addNpc(*npcClay);
     locationMac->addItem(*itemAle);
+    locationMac->addItem(*itemBat);
 
     locationManitou->addNpc(*npcSmeech);
     locationManitou->addItem(*itemWine);
@@ -174,7 +176,25 @@ std::map<std::string, Command> Game::setupCommands() {
 
 
 void Game::showHelp(std::vector<std::string> target) {
-    std::cout << "help provided" << std::endl;
+    std::cout << std::endl << "* - May require special condidtions to be met" << std::endl;
+    std::string commandPattern = "You're input will be broken up into [Command][Object]";
+    std::cout << commandPattern << std::endl << std::endl;
+
+    std::cout << "Available Commands:" << std::endl;
+    std::cout << "  talk        - Converse with the characters in any room." << std::endl;
+    std::cout << "  meet        - Display a description of the type of ... creature." << std::endl;
+    std::cout << "  take        - Place an item in your backpack to carry it around." << std::endl;
+    std::cout << "  give        - Leave an item in a room ... or give to certain characters." << std::endl;
+    std::cout << "  go          - Follow this with a direction to travel to new locations." << std::endl;
+    std::cout << "  warp        - *Follow this with a location to warp directly there." << std::endl;
+
+    std::cout << std::endl << "Stand Alone Commands:" << std::endl;
+    std::cout << "  help (h)    - Display this directive." << std::endl;
+    std::cout << "  quit (q)    - Exit the game." << std::endl;
+    std::cout << "  backpack    - Displays the carried items." << std::endl;
+    std::cout << "  items       - Alias for backpack." << std::endl;
+    std::cout << "  look/where  - Get an idea of your surroundings." << std::endl;
+    std::cout << std::endl;
 }
 
 
@@ -247,6 +267,7 @@ void Game::take(std::vector<std::string> target) {
     bool found = false;
     for (auto it = locItems.begin(); it != locItems.end(); ++it) {
         if (toLower(it->getName()) == itemName) {
+            itemWeight += it->getWeight();
             // Item found: add it to the game inventory.
             items.push_back(*it);
             // Remove the item from the location.
@@ -320,7 +341,11 @@ void Game::give(std::vector<std::string> target) {
 
 
 void Game::go(std::vector<std::string> target) {
-    //std::cout << "go" << std::endl;
+    if (itemWeight >= 30) {
+        std::cout << "You are too heavy to move! Please drop some items." << std::endl;
+        return;
+    }
+
     if (target.empty()) {
         std::cout << "You didn't tell me where we are going..." << std::endl;
         return;
