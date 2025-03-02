@@ -21,8 +21,10 @@ class Location {
         std::string getDesc() const;
         std::map<std::string, std::reference_wrapper<Location>> getLocations() const;
         std::vector<Npc> getNpcs() const;
+        // Reference used to directly change npcs (not copies)
         std::vector<Npc>& getNpcsRef();
         std::vector<Item> getItems() const;
+        // Reference used to directly change items (not copies)
         std::vector<Item>& getItemsRef();
         bool getVisited() const;
 
@@ -45,9 +47,7 @@ class Location {
         bool hasVisited = false;
         // It is a map of {direction: Location object} -- has to be reference wrapped bc map expects value not ref
         std::map<std::string, std::reference_wrapper<Location>> neighborsMap;
-
         std::vector<Npc> npcVec;
         std::vector<Item> itemVec;
 };
-
 #endif

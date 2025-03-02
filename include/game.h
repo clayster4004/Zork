@@ -19,14 +19,12 @@ typedef std::function<void(std::vector<std::string>)> Command;
 class Game {
     public:
         // Will need to hold a cmd list, item list, int weight, vector of locations
-        // that exist in the world, var current location, int numCals for elf
-        // bool gameDone
+        // that exist in the world, var current location, int numCals for elf (Powder)
 
         // Constructor needs nothing initially
         Game();
-
-        // Initialize getters
-        // Initialize setters
+        // Deconstructor
+        ~Game();
 
         // Additional Functions
         std::map<std::string, Command> setupCommands();
@@ -40,11 +38,13 @@ class Game {
         void go(std::vector<std::string> target);
         void showItems(std::vector<std::string> target);
         void look(std::vector<std::string> target);
-        static void quit(std::vector<std::string> target);
+        void quit(std::vector<std::string> target);
 
         // Two additional functions
         void warp(std::vector<std::string> target);
         void study(std::vector<std::string> target);
+
+        // Main play function
         void play();
 
     private:
@@ -53,12 +53,12 @@ class Game {
         int itemWeight;
         std::vector<std::reference_wrapper<Location>> locations;
         Location currentLocation;
-        //std::reference_wrapper<Location> currentLocation;
         int neededCals = 500;
         bool gameContinue = true;
 
+        // Used to deconstruct everything
+        std::vector<Location*> allocatedLocations;
+        std::vector<Npc*> allocatedNpcs;
+        std::vector<Item*> allocatedItems;
 };
-
-
-
 #endif

@@ -33,7 +33,5 @@ class Npc {
         std::string desc;
         int messageNum = 0;
         std::vector<std::string> messageVec;
-
 };
-
 #endif

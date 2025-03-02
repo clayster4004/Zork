@@ -11,6 +11,29 @@ Game::Game() : currentLocation("Default Location", "Default Description"){
     createWorld();
 }
 
+
+// Written by ChatGPT to help clear all my allocated memory
+Game::~Game() {
+    // Delete all allocated Locations
+    for (Location* loc : allocatedLocations) {
+        delete loc;
+    }
+    allocatedLocations.clear();
+
+    // Delete all allocated NPCs
+    for (Npc* npc : allocatedNpcs) {
+        delete npc;
+    }
+    allocatedNpcs.clear();
+
+    // Delete all allocated Items
+    for (Item* item : allocatedItems) {
+        delete item;
+    }
+    allocatedItems.clear();
+}
+
+
 // Used ChatGPT to write this lowercase function
 std::string toLower(const std::string& s) {
     std::string result = s;
@@ -51,6 +74,16 @@ void Game::createWorld() {
     Location* locationLibrary = new Location("Library", "Lots of books...and desks");
     Location* locationWoods = new Location("Woods Behind Campus", "Lots of empty beer cans...");
 
+    // Add to this vector to deallocate later
+    allocatedLocations.push_back(locationMac);
+    allocatedLocations.push_back(locationManitou);
+    allocatedLocations.push_back(locationKirkhof);
+    allocatedLocations.push_back(locationKindschi);
+    allocatedLocations.push_back(locationRec);
+    allocatedLocations.push_back(locationClockTower);
+    allocatedLocations.push_back(locationLibrary);
+    allocatedLocations.push_back(locationWoods);
+
     // Create all the NPCs
     // Kudos if you play the game !
     Npc* npcClay = new Npc("Clay", "Somehow making it through");
@@ -61,6 +94,16 @@ void Game::createWorld() {
     Npc* npcMord = new Npc("Mordekaiser", "Looks like a medieval knight, except 10 times as big");
     Npc* npcElise = new Npc("Elise", "She can shapesift into a spider, that's pretty cool I guess");
     Npc* npcPowder = new Npc("Powder", "A seemingly normal child among all the beasts");
+
+    // To deallocate later
+    allocatedNpcs.push_back(npcClay);
+    allocatedNpcs.push_back(npcSmeech);
+    allocatedNpcs.push_back(npcSteb);
+    allocatedNpcs.push_back(npcScar);
+    allocatedNpcs.push_back(npcTwitch);
+    allocatedNpcs.push_back(npcMord);
+    allocatedNpcs.push_back(npcElise);
+    allocatedNpcs.push_back(npcPowder);
 
     // Add the voice lines to the characters
     npcClay->addMessage("I do most of my studying in Macinac, although I'm graduating very soon!");
@@ -112,6 +155,21 @@ void Game::createWorld() {
     Item* itemRock = new Item("Rock", "This probably means something to a geologist", 0, 7.5);
     Item* itemMicroscope = new Item("Microscope", "Maybe there's somewhere this belongs?", 0, 7.5);
     Item* itemDna = new Item("DNA", "I wonder who's DNA Sample this is?", 0, 1);
+
+    // To deallocate later
+    allocatedItems.push_back(itemAle);
+    allocatedItems.push_back(itemWine);
+    allocatedItems.push_back(itemVodka);
+    allocatedItems.push_back(itemBrandy);
+    allocatedItems.push_back(itemLager);
+    allocatedItems.push_back(itemMead);
+    allocatedItems.push_back(itemCocktail);
+    allocatedItems.push_back(itemOrb);
+    allocatedItems.push_back(itemBat);
+    allocatedItems.push_back(itemDumbell);
+    allocatedItems.push_back(itemRock);
+    allocatedItems.push_back(itemMicroscope);
+    allocatedItems.push_back(itemDna);
 
     // Place the npcs and the items in the locations
     locationMac->addNpc(*npcClay);
@@ -185,8 +243,6 @@ std::map<std::string, Command> Game::setupCommands() {
 
     commands["help"] = showHelp;
     commands["h"] = showHelp;
-    commands["quit"] = quit;
-    commands["q"] = quit;
 
     // In order to set this up to work with non-static functions I have to define everything
     // a little differently to work with class instances (even as aliases)
@@ -204,12 +260,15 @@ std::map<std::string, Command> Game::setupCommands() {
     commands["where"] = [this](std::vector<std::string> target) { this->look(target); };
     commands["warp"] = [this](std::vector<std::string> target) { this->warp(target); };
     commands["study"] = [this](std::vector<std::string> target) { this->study(target); };
+    commands["quit"] = [this](std::vector<std::string> target) { this->quit(target); };
+    commands["q"] = [this](std::vector<std::string> target) { this->quit(target); };
     
     return commands;
 }
 
 
 void Game::showHelp(std::vector<std::string> target) {
+    // Print out a pretty help screen
     std::cout << std::endl << "* - May require special condidtions to be met" << std::endl;
     std::string commandPattern = "You're input will be broken up into [Command][Object]";
     std::cout << commandPattern << std::endl << std::endl;
@@ -234,6 +293,7 @@ void Game::showHelp(std::vector<std::string> target) {
 
 
 void Game::talk(std::vector<std::string> target) {
+    // Display message if there are no objects
     if (target.empty()) {
         std::cout << "Talk to whom?" << std::endl;
         return;
@@ -241,11 +301,14 @@ void Game::talk(std::vector<std::string> target) {
     
     std::string npcName = target[0];
     
-    // Use the non-const accessor to get the actual NPCs
+    // Use the non-const accessor to get the actual NPCs so the message cycling works
     std::vector<Npc>& npcs = currentLocation.getNpcsRef();
     
+    // Check to see if the NPC is in the area the player is in 
     bool found = false;
+    // Loop over the npcs in the area
     for (auto &npc : npcs) {
+        // If the user typed their name, get the message and break out of the loop
         if (toLower(npc.getName()) == npcName) {
             std::string message = npc.getMessage();
             std::cout << npc.getName() << " says:" << std::endl
@@ -255,6 +318,7 @@ void Game::talk(std::vector<std::string> target) {
         }
     }
     
+    // If nobody is found let the user know
     if (!found) {
         std::cout << "There is no one named \"" << npcName << "\" here." << std::endl;
     }
@@ -262,15 +326,17 @@ void Game::talk(std::vector<std::string> target) {
 
 
 void Game::meet(std::vector<std::string> target) {
-    //std::cout << "meet" << std::endl;
+    // If the user did not type an object
     if (target.empty()) {
         std::cout << "Who are we meeting...?" << std::endl;
         return;
     }
     std::string npcName = target[0];
 
+    // Get the NPCs in the current location
     std::vector<Npc> npcs = currentLocation.getNpcs();
 
+    // Loop over to see if they are there, if so print the description
     bool found = false;
     for (const auto& npc: npcs) {
         if (toLower(npc.getName()) == npcName) {
@@ -279,14 +345,15 @@ void Game::meet(std::vector<std::string> target) {
             break;
         }
     }
+    // If that npc is not here let the user know
     if (!found) {
         std::cout << "No one by that name is here." << std::endl;
     }
-
 }
 
 
 void Game::take(std::vector<std::string> target) {
+    // If the user did not type an object
     if (target.empty()) {
         std::cout << "Take what?" << std::endl;
         return;
@@ -294,29 +361,29 @@ void Game::take(std::vector<std::string> target) {
 
     std::string itemName = target[0];
     
-    // Get a reference to the current location's items.
-    // If your getItems() returns by value, you'll need to change it so that you can modify the vector.
+    // Get a reference to the actual original items so they won't reappear in locations
     std::vector<Item>& locItems = currentLocation.getItemsRef();
     
+    // Ensure the item is in the location vector, add the weight to the user, obtain item
     bool found = false;
     for (auto it = locItems.begin(); it != locItems.end(); ++it) {
         if (toLower(it->getName()) == itemName) {
             itemWeight += it->getWeight();
-            // Item found: add it to the game inventory.
+            // Item found -> add it to the game inventory
             items.push_back(*it);
-            // Remove the item from the location.
+            // Remove the item from the location
             locItems.erase(it);
             std::cout << "You picked up " << itemName << "." << std::endl << std::endl;
             found = true;
             break;
         }
     }
-
+    // If that item is not here let the user know
     if (!found) {
         std::cout << "There is no " << itemName << " here." << std::endl;
     }
 
-    // Update the global copy of the current location.
+    // Ensure the actual global location is being updated accordingly <- ChatGPT helped me with this idea
     for (auto &locRef : locations) {
         if (toLower(locRef.get().getName()) == toLower(currentLocation.getName())) {
             locRef.get() = currentLocation;
@@ -327,6 +394,7 @@ void Game::take(std::vector<std::string> target) {
 
 
 void Game::give(std::vector<std::string> target) {
+    // If the user did not pass in an object
     if (target.empty()) {
         std::cout << "Give what?" << std::endl << std::endl;
         return;
@@ -334,33 +402,30 @@ void Game::give(std::vector<std::string> target) {
 
     std::string itemName = target[0];
 
-    // Search the player's inventory for the item.
+    // Search the player's inventory for the item -- ChatGPT
     auto it = std::find_if(items.begin(), items.end(),
                            [&](const Item &i) { return toLower(i.getName()) == itemName; });
     if (it == items.end()) {
+        // Item not in inventory
         std::cout << "You don't have a " << itemName << "." << std::endl << std::endl;
         return;
     }
-
-    // Found the item. Save a copy (or you could move it if C++11 move semantics apply).
+    // The item was found, save a copy
     Item item = *it;
-    
-    // Decrease the carried weight by the item's weight.
+    // Decrease the carried weight by the item's weight
     itemWeight -= item.getWeight();
-
-    // Remove the item from the player's inventory.
+    // Remove the item from the player's inventory
     items.erase(it);
 
-    // Now check if the current location is the woods.
+    // Now check if the current location is the woods
     if (currentLocation.getName() == "Woods Behind Campus") {
-        // Check if the item is edible. Here, we assume that an edible item has positive calories.
+        // If the item has positive cals -> reduce cals needed and print message
         if (item.getNumCals() > 0) {
-            // If edible, reduce the calories needed.
             neededCals -= item.getNumCals();
             std::cout << "You fed Powder with " << item.getName() 
                       << ". Calories reduced by " << item.getNumCals() << "." << std::endl << std::endl;
 
-            // Check if the requirement has been met
+            // Check if the requirement has been met -> fun ending as well
             if (neededCals <= 0) {
                 std::cout << "You've done it! You've helped me succeed, said Powder." << std::endl;
                 std::cout << "You hear a loud roar from benhind you deeper into the woods." << std::endl;
@@ -375,57 +440,57 @@ void Game::give(std::vector<std::string> target) {
                 if (choice == "yes" || choice == "y") {
                     std::cout << std::endl << "You take Powder's hand and step into the portal..." << std::endl;
                     std::cout << "A feeling of bliss overtakes you... You feel... Happy..." << std::endl;
-                    std::exit(0);
+                    this->quit(target);
                 } else {
                     std::cout << std::endl << "You let her go. Powder watches as the portal slowly closes behind her." << std::endl;
                     std::cout << "What is next for me? You look around confused, why didn't you take her hand?" << std::endl;
                     std::cout << "You feel a lightheadedness entering your brain. Is this the end?" << std::endl;
                     std::cout << "You faint... You feel... Lost..." << std::endl;
-
+                    this->quit(target);
                 }
-                std::exit(0);
             }
         } else {
-            // If not edible, transport the player to a new random location.
+            // If not edible, transport the player to a new random location
             currentLocation = randomLocation();
             std::cout << "That item is not edible! You are transported to " 
                       << currentLocation.getName() << "." << std::endl << std::endl;
         }
     } else {
-        // Add the item to the current location's inventory.
+        // You are not in the woods, place the item wherever you are
         currentLocation.getItemsRef().push_back(item);
-        // For other locations, simply confirm the item was given.
-        std::cout << "You gave " << item.getName() << " to the current location." << std::endl << std::endl;
+        std::cout << "You placed " << item.getName() << " in your current location." << std::endl << std::endl;
     }
 
-    // Update the global copy of the current location.
+    // Update the global copy of the current location -- ChatGPT
     for (auto &locRef : locations) {
         if (toLower(locRef.get().getName()) == toLower(currentLocation.getName())) {
             locRef.get() = currentLocation;
             break;
         }
     }
-
 }
 
 
 void Game::go(std::vector<std::string> target) {
+    // You have too many items
     if (itemWeight >= 30) {
         std::cout << "You are too heavy to move! Please drop some items." << std::endl;
         return;
     }
 
+    // You did not give an object
     if (target.empty()) {
         std::cout << "You didn't tell me where we are going..." << std::endl;
         return;
     }
 
-    // Take the first token to signal the direction in which you want to travel
     std::string direction = target[0];
 
+    // Get the neighbors of your location and see if you gave a valid travelable location
     auto neighbors = currentLocation.getLocations();
     auto it = neighbors.find(direction);
 
+    // If you did set the visited flag and display a message
     if (it != neighbors.end()) {
         it->second.get().setVisited();
         currentLocation = it->second.get();
@@ -438,6 +503,7 @@ void Game::go(std::vector<std::string> target) {
 
 
 void Game::showItems(std::vector<std::string> target) {
+    // Display your items
     if (items.empty()) {
         std::cout << "There are no items." << std::endl << std::endl;
         return;
@@ -451,44 +517,45 @@ void Game::showItems(std::vector<std::string> target) {
 
 
 void Game::look(std::vector<std::string> target) {
+    // Show the information regarding your current location
     std::cout << currentLocation << std::endl;
 }
 
 
 void Game::warp(std::vector<std::string> target) {
-    // Check if the orb is in the player's inventory.
+    // Check if the orb is in the player's inventory -- ChatGPT
     auto orbIt = std::find_if(items.begin(), items.end(),
                                [&](const Item &i) { 
                                    return toLower(i.getName()) == "orb"; 
                                });
+    // No orb :(
     if (orbIt == items.end()) {
         std::cout << "You don't have the orb. You cannot warp!" << std::endl << std::endl;
         return;
     }
 
-    // Ensure a target location was provided.
+    // No object provided
     if (target.empty()) {
         std::cout << "Warp where?" << std::endl << std::endl;
         return;
     }
     
-    // Join all tokens in target into one string (separated by spaces)
+    // Join all tokens in target into one string -- multi word locations
     std::string warpTarget;
     for (const auto& token : target) {
         warpTarget += token + " ";
     }
     if (!warpTarget.empty())
-        warpTarget.pop_back();  // Remove trailing space
-
-    // Convert the full warp target to lowercase.
+        warpTarget.pop_back();
+    // Convert the full warp target to lowercase
     warpTarget = toLower(warpTarget);
     bool found = false;
     
-    // Search through the locations vector.
+    // Check to see if the user provided a target available to travel to
     for (auto &locRef : locations) {
         // Compare stored location name (converted to lowercase) with the warp target.
         if (toLower(locRef.get().getName()) == warpTarget) {
-            // Found the location. Update currentLocation.
+            // Found the location -> Update currentLocation
             currentLocation = locRef.get();
             currentLocation.setVisited();  // Mark as visited
             std::cout << "Warping to " << currentLocation.getName() << "!" << std::endl << std::endl;
@@ -497,6 +564,7 @@ void Game::warp(std::vector<std::string> target) {
         }
     }
     
+    // Not a valid location
     if (!found) {
         std::cout << "No such location: " << warpTarget << std::endl << std::endl;
     }
@@ -504,6 +572,7 @@ void Game::warp(std::vector<std::string> target) {
 
 
 void Game::study(std::vector<std::string> target) {
+    // If you are not in kindschi
     if (toLower(currentLocation.getName()) != "kindschi") {
         std::cout << "You try to study the items in the area but nothing happens." << std::endl;
         return;
@@ -514,6 +583,7 @@ void Game::study(std::vector<std::string> target) {
     bool hasMicroscope = false;
     bool hasDNA = false;
 
+    // Check to see if the user has given the microscope and dna to the location
     for (const auto& item: locItems) {
         std::string nameLower = toLower(item.getName());
         if (nameLower == "microscope") {
@@ -523,11 +593,15 @@ void Game::study(std::vector<std::string> target) {
         }
     }
 
+    // If they did they found the secret ending
     if (hasDNA && hasMicroscope) {
         std::cout << std::endl
-                  << "Secret Ending Unlocked: You study the items carefully and piece together the clues!" << std::endl
-                  << "The secrets of Kindschi are revealed, and you win the game!" << std::endl << std::endl;
-        std::exit(0);
+                  << "Secret Ending Unlocked:" << std::endl
+                  << "You look at the DNA, uncovering the secrets of those here before." << std::endl
+                  << "Am I really seeing what I'm seeing?" << std::endl
+                  << "You wake up in a cold sweat... Oh... It was just a dream..." << std::endl;
+        this->quit(target);
+    // They are in kindschi but didn't have the required items
     } else {
         std::cout << "You study the area, but something seems to be missing..." << std::endl;
     }
@@ -535,9 +609,9 @@ void Game::study(std::vector<std::string> target) {
 
 
 void Game::quit(std::vector<std::string> target) {
-    std::exit(0);
+    // The loop will cease, game will be deallocated in main
+    gameContinue = false;
 }
-
 
 // Written by ChatGPT
 Location& Game::randomLocation() {
@@ -555,6 +629,7 @@ Location& Game::randomLocation() {
 
 
 void Game::play() {
+    // Fun message to start the game
     std::cout << "You wake up, find yourself on the campus of Grand Valley..." << std::endl
               << "Do your best to unlock the secrets that lay before you..." << std::endl
               << "Good Luck..." << std::endl << std::endl;
@@ -563,7 +638,7 @@ void Game::play() {
     while (gameContinue) {
         std::cout << "-> ";
         std::getline(std::cin, response);
-        // Checks the function to define the type at compile time
+        // Tokenize the response
         auto tokenizedResponse = tokenizeInput(response);
         // If its blank, continue the loop
         if (tokenizedResponse.empty()) continue;
@@ -572,10 +647,11 @@ void Game::play() {
         // https://stackoverflow.com/questions/40656871/remove-from-the-beginning-of-stdvector
         tokenizedResponse.erase(tokenizedResponse.begin());
 
-        // Look up the command in the commands map.
+        // Look up the command in the commands map
         auto cmdIt = commands.find(userCommand);
         if (cmdIt != commands.end()) {
             cmdIt->second(tokenizedResponse);
+        // If the command is invalid
         } else {
             std::cout << "Unknown command: " << userCommand << std::endl;
         }

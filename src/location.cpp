@@ -1,11 +1,13 @@
 #include "location.h"
 #include <stdexcept>
 
+// Constructor
 Location::Location(const std::string& name, const std::string& desc) {
     setName(name);
     setDesc(desc);
 }
 
+// Getters
 std::string Location::getName() const {
     return this->name;
 }
@@ -69,6 +71,7 @@ void Location::addItem (const Item& item) {
     itemVec.push_back(item);
 }
 
+// Print out operator
 std::ostream& operator<<(std::ostream& os, const Location& location) {
     // The basic information regarding the location
     os << location.name << " - " << location.desc << std::endl << std::endl;

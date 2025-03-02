@@ -1,6 +1,7 @@
 #include "npc.h"
 #include <stdexcept>
 
+// Constructor
 Npc::Npc(const std::string& name, const std::string& desc) {
     setName(name);
     setDesc(desc);
@@ -29,6 +30,7 @@ std::string Npc::getDesc() const {
     return this->desc;
 }
 
+// Cycle through and return the message the npc is on
 std::string Npc::getMessage() {
     if (messageNum >= messageVec.size()) {
         messageNum = 0;
@@ -39,6 +41,7 @@ std::string Npc::getMessage() {
     return message;
 }
 
+// Add messages to message vec
 void Npc::addMessage(const std::string& newMessage) {
     messageVec.push_back(newMessage);
 }

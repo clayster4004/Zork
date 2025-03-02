@@ -6,9 +6,9 @@
 #include "game.h"
 
 int main() {
-    
+    // Create a game instance and run the play function
     Game* myGame = new Game();
     myGame->play();
-
+    delete myGame;
     return 0;
 }

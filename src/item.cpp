@@ -1,7 +1,6 @@
 #include "item.h"
 #include <stdexcept>
 
-// Shows the implementation of the item.h file
 // Call the setters upon initialization to ensure appropriate error handling
 Item::Item(const std::string& name, const std::string& desc, int numCals, float weight) {
   setName(name);

@@ -28,12 +28,10 @@ class Item {
         // This line I got from ChatGPT
         friend std::ostream& operator<<(std::ostream& os, const Item& item);
         
-
     private:
         std::string name;
         std::string desc;
         int numCals;
         float weight;
 };
-
 #endif
